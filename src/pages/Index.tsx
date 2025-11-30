@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Icon from '@/components/ui/icon';
 import DonationDialog from '@/components/DonationDialog';
+import MessageDialog from '@/components/MessageDialog';
 
 type Section = 'home' | 'streams' | 'categories' | 'subscriptions' | 'favorites' | 'chat' | 'notifications' | 'profile';
 
@@ -94,11 +95,19 @@ const categories = [
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>('home');
   const [donationDialogOpen, setDonationDialogOpen] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [selectedStreamer, setSelectedStreamer] = useState<string>('');
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('');
 
   const handleDonateClick = (streamerName: string) => {
     setSelectedStreamer(streamerName);
     setDonationDialogOpen(true);
+  };
+
+  const handleMessageClick = (streamerName: string, avatar: string) => {
+    setSelectedStreamer(streamerName);
+    setSelectedAvatar(avatar);
+    setMessageDialogOpen(true);
   };
 
   const navItems = [
@@ -178,17 +187,31 @@ export default function Index() {
                           </Badge>
                         </div>
                       </div>
-                      <Button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDonateClick(stream.streamer);
-                        }}
-                        className="w-full gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
-                        size="sm"
-                      >
-                        <Icon name="Heart" size={14} className="mr-2" />
-                        Отправить донат
-                      </Button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMessageClick(stream.streamer, stream.avatar);
+                          }}
+                          variant="outline"
+                          className="border-primary/30 hover:bg-primary/10 hover:border-primary transition-all duration-300"
+                          size="sm"
+                        >
+                          <Icon name="MessageCircle" size={14} className="mr-1" />
+                          Написать
+                        </Button>
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDonateClick(stream.streamer);
+                          }}
+                          className="gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                          size="sm"
+                        >
+                          <Icon name="Heart" size={14} className="mr-1" />
+                          Донат
+                        </Button>
+                      </div>
                     </div>
                   </Card>
                 ))}
@@ -260,17 +283,31 @@ export default function Index() {
                         </Badge>
                       </div>
                     </div>
-                    <Button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDonateClick(stream.streamer);
-                      }}
-                      className="w-full gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
-                      size="sm"
-                    >
-                      <Icon name="Heart" size={14} className="mr-2" />
-                      Отправить донат
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMessageClick(stream.streamer, stream.avatar);
+                        }}
+                        variant="outline"
+                        className="border-primary/30 hover:bg-primary/10 hover:border-primary transition-all duration-300"
+                        size="sm"
+                      >
+                        <Icon name="MessageCircle" size={14} className="mr-1" />
+                        Написать
+                      </Button>
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDonateClick(stream.streamer);
+                        }}
+                        className="gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                        size="sm"
+                      >
+                        <Icon name="Heart" size={14} className="mr-1" />
+                        Донат
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -335,14 +372,61 @@ export default function Index() {
       case 'chat':
         return (
           <div className="space-y-6 slide-in-right">
-            <h1 className="text-4xl font-bold text-gradient">Чат</h1>
-            <Card className="h-[600px] flex items-center justify-center card-hover-lift">
-              <div className="text-center fade-slide-up">
-                <Icon name="MessageCircle" size={80} className="mx-auto text-muted-foreground mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Выберите стрим</h2>
-                <p className="text-muted-foreground">Чтобы начать общение, откройте любую трансляцию</p>
-              </div>
-            </Card>
+            <h1 className="text-4xl font-bold text-gradient">Личные сообщения</h1>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <Card className="lg:col-span-1 p-4 space-y-3">
+                <h3 className="font-bold flex items-center gap-2">
+                  <Icon name="MessageSquare" size={18} className="text-primary" />
+                  Ваши чаты
+                </h3>
+                <div className="space-y-2">
+                  {mockStreams.slice(0, 4).map((stream) => (
+                    <button
+                      key={stream.id}
+                      onClick={() => handleMessageClick(stream.streamer, stream.avatar)}
+                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-all duration-300 text-left"
+                    >
+                      <Avatar className="border-2 border-primary">
+                        <AvatarFallback className="bg-primary text-black font-bold text-xs">
+                          {stream.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm">{stream.streamer}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          Нажмите, чтобы написать...
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        <Icon name="Send" size={10} className="mr-1" />
+                      </Badge>
+                    </button>
+                  ))}
+                </div>
+              </Card>
+              
+              <Card className="lg:col-span-2 p-6">
+                <div className="h-[500px] flex items-center justify-center">
+                  <div className="text-center fade-slide-up">
+                    <Icon name="MessageCircle" size={80} className="mx-auto text-muted-foreground mb-4" />
+                    <h2 className="text-2xl font-bold mb-2">Начните общение</h2>
+                    <p className="text-muted-foreground mb-6">
+                      Выберите стримера слева или нажмите "Написать" на карточке стрима
+                    </p>
+                    <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                      <div className="bg-secondary/50 rounded-lg p-3 text-sm">
+                        <Icon name="Info" size={16} className="inline mr-2 text-primary" />
+                        Прямая связь со стримерами
+                      </div>
+                      <div className="bg-secondary/50 rounded-lg p-3 text-sm">
+                        <Icon name="Heart" size={16} className="inline mr-2 text-primary" />
+                        Дружеское общение и поддержка
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         );
 
@@ -451,6 +535,13 @@ export default function Index() {
         open={donationDialogOpen} 
         onOpenChange={setDonationDialogOpen}
         streamerName={selectedStreamer}
+      />
+
+      <MessageDialog 
+        open={messageDialogOpen} 
+        onOpenChange={setMessageDialogOpen}
+        streamerName={selectedStreamer}
+        streamerAvatar={selectedAvatar}
       />
     </div>
   );
