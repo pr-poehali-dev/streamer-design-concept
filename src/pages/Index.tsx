@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Icon from '@/components/ui/icon';
+import DonationDialog from '@/components/DonationDialog';
 
 type Section = 'home' | 'streams' | 'categories' | 'subscriptions' | 'favorites' | 'chat' | 'notifications' | 'profile';
 
@@ -92,6 +93,13 @@ const categories = [
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>('home');
+  const [donationDialogOpen, setDonationDialogOpen] = useState(false);
+  const [selectedStreamer, setSelectedStreamer] = useState<string>('');
+
+  const handleDonateClick = (streamerName: string) => {
+    setSelectedStreamer(streamerName);
+    setDonationDialogOpen(true);
+  };
 
   const navItems = [
     { id: 'home' as Section, label: 'Главная', icon: 'Home' },
@@ -170,6 +178,17 @@ export default function Index() {
                           </Badge>
                         </div>
                       </div>
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDonateClick(stream.streamer);
+                        }}
+                        className="w-full gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                        size="sm"
+                      >
+                        <Icon name="Heart" size={14} className="mr-2" />
+                        Отправить донат
+                      </Button>
                     </div>
                   </Card>
                 ))}
@@ -241,6 +260,17 @@ export default function Index() {
                         </Badge>
                       </div>
                     </div>
+                    <Button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDonateClick(stream.streamer);
+                      }}
+                      className="w-full gradient-orange-hover hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                      size="sm"
+                    >
+                      <Icon name="Heart" size={14} className="mr-2" />
+                      Отправить донат
+                    </Button>
                   </div>
                 </Card>
               ))}
@@ -416,6 +446,12 @@ export default function Index() {
 
         <main className="flex-1 p-8">{renderContent()}</main>
       </div>
+
+      <DonationDialog 
+        open={donationDialogOpen} 
+        onOpenChange={setDonationDialogOpen}
+        streamerName={selectedStreamer}
+      />
     </div>
   );
 }
